@@ -20,6 +20,7 @@
     "@angular/platform-server": "^22.0.0",
     "@angular/router": "^22.0.0",
     "@angular/ssr": "^22.0.7",
+    "@preline/toggle-password": "^4.2.0",
     "express": "^5.1.0",
     "postcss": "^8.5.19",
     "rxjs": "~7.8.0",

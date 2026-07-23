@@ -1,20 +1,30 @@
-import { Component } from '@angular/core';
-import {Router} from '@angular/router';
-
+import { Component, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { VisualizacaoSenha } from '../../../shared/services/visualizacao-senha';
 @Component({
   selector: 'app-login',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
 export class Login {
-  isLoginMode = true
+  private router = inject(Router); // Usando a função inject() moderna do Angular
+  private visualizacao = inject(VisualizacaoSenha);
 
-  constructor(private router: Router){
+  tipoSenha = signal('password');
 
+  // Recebemos os valores diretamente como parâmetros da função!
+  executarLogin(nome: string, senha: string): void {
+    if (nome === 'admin' && senha === 'admin') {
+      this.router.navigate(['/admin']);
+    } else if (nome === 'client' && senha === 'client') {
+      this.router.navigate(['/cliente']);
+    } else {
+      alert('Usuário ou senha incorretos!');
+    }
   }
 
-  executarLogin(): void{
-    this.router.navigate(['/admin']);
+  toggleSenha(): void {
+    this.tipoSenha.update(type => this.visualizacao.toogleInputType(type));
   }
 }

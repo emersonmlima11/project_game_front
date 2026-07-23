@@ -1,0 +1,181 @@
+<div class="min-h-screen bg-background text-white flex flex-col md:flex-row font-sans">
+
+  <!-- BARRA SUPERIOR MOBILE (PADRÃO ADMIN) -->
+  <div class="md:hidden bg-sidebar/80 backdrop-blur-md px-4 py-3 flex justify-between items-center border-b border-surface sticky top-0 z-40">
+    <div class="flex items-center gap-2">
+      <div class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></div>
+      <span class="font-bold text-xs tracking-wider uppercase text-white">GameStore</span>
+    </div>
+    <button 
+      (click)="menuMobileAberto.set(!menuMobileAberto())" 
+      class="text-text-gray hover:text-white p-1 text-lg focus:outline-none transition-colors"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- SIDEBAR LATERAL DO CLIENTE -->
+  <aside 
+    [class.hidden]="!menuMobileAberto()"
+    class="w-full md:w-64 bg-sidebar border-r border-surface p-6 flex flex-col justify-between shrink-0 md:block transition-all"
+  >
+    <div class="flex flex-col gap-6">
+      <!-- SÍMBOLO PULSANTE GAMESTORE -->
+      <div class="hidden md:flex items-center gap-3">
+        <div class="w-3 h-3 rounded-full bg-primary animate-pulse"></div>
+        <span class="font-extrabold tracking-wider text-sm uppercase text-primary">GameStore</span>
+      </div>
+
+      <!-- NAVEGAÇÃO CLIENTE -->
+      <nav class="flex flex-col gap-1 mt-2">
+        <button 
+          (click)="mudarAba('vitrine')"
+          [class.text-primary]="abaAtiva() === 'vitrine'"
+          [class.font-bold]="abaAtiva() === 'vitrine'"
+          class="text-left py-2.5 px-3 rounded-lg text-sm text-text-gray hover:text-white hover:bg-surface/50 transition-all cursor-pointer"
+        >
+          Vitrine da Loja
+        </button>
+
+        <button 
+          (click)="mudarAba('meus-dados')"
+          [class.text-primary]="abaAtiva() === 'meus-dados'"
+          [class.font-bold]="abaAtiva() === 'meus-dados'"
+          class="text-left py-2.5 px-3 rounded-lg text-sm text-text-gray hover:text-white hover:bg-surface/50 transition-all cursor-pointer"
+        >
+          Meus Dados
+        </button>
+      </nav>
+    </div>
+
+    <!-- BOTÕES INFERIORES: ALTERNAR TEMA E SAIR -->
+    <div class="mt-8 md:mt-0 pt-4 border-t border-surface flex flex-col gap-2">
+      <button (click)="sair()" class="text-left py-2 px-3 text-sm text-text-gray hover:text-red-400 transition-colors cursor-pointer w-full">
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <!-- ÁREA PRINCIPAL -->
+  <main class="flex-1 p-6 md:p-12 overflow-y-auto">
+
+    <!-- ABA 1: VITRINE DA LOJA -->
+    @if (abaAtiva() === 'vitrine') {
+      <div class="flex flex-col gap-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 class="text-xs font-bold tracking-widest text-text-gray uppercase">VITRINE DA LOJA</h1>
+            <div class="text-primary font-bold text-xl mt-1">
+              Seu Saldo: R$ {{ saldo().toFixed(2) }}
+            </div>
+          </div>
+
+          <input 
+            type="text" 
+            placeholder="Pesquisar jogo por nome..." 
+            [value]="termoBusca()"
+            (input)="termoBusca.set($any($event.target).value)"
+            class="bg-surface text-white placeholder-text-gray text-sm px-4 py-2.5 rounded-full w-full md:w-80 outline-none border border-transparent focus:border-primary"
+          />
+        </div>
+
+        @if (jogosFiltrados().length > 0) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            @for (jogo of jogosFiltrados(); track jogo.id) {
+            <div class="bg-surface/50 border border-surface hover:border-primary/50 rounded-xl overflow-hidden transition-all duration-300 flex flex-col group">
+                <div class="h-48 w-full overflow-hidden bg-background relative">
+                <img [src]="jogo.capaUrl" [alt]="jogo.nome" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                </div>
+
+                <div class="p-4 flex flex-col gap-3 flex-1 justify-between">
+                <div>
+                    <h3 class="font-bold text-white text-base leading-tight">{{ jogo.nome }}</h3>
+                    <span class="text-lg font-extrabold text-primary mt-1 block">R$ {{ jogo.preco.toFixed(2) }}</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                    <button (click)="abrirDetalhes(jogo)" class="bg-zinc-700 hover:bg-zinc-600 text-white text-xs font-semibold py-2 rounded transition-colors cursor-pointer">
+                    Detalhes
+                    </button>
+                    <button (click)="comprarJogo(jogo)" class="bg-primary hover:bg-primary-hover text-white text-xs font-bold py-2 rounded transition-colors cursor-pointer">
+                    Comprar
+                    </button>
+                </div>
+                </div>
+            </div>
+            }
+        </div>
+        } 
+        <!-- Mensagem elegante de quando nenhum jogo for encontrado -->
+        @else {
+        <div class="w-full bg-surface/30 border border-surface/50 rounded-xl p-12 text-center text-text-gray text-sm">
+            Nenhum jogo encontrado para <strong class="text-white">"{{ termoBusca() }}"</strong>.
+        </div>
+        }
+      </div>
+    }
+
+    <!-- ABA 2: MEUS DADOS E ADICIONAR SALDO -->
+    @if (abaAtiva() === 'meus-dados') {
+      <div class="max-w-xl flex flex-col gap-6">
+        <h1 class="text-xs font-bold tracking-widest text-text-gray uppercase">MEUS DADOS</h1>
+
+        <div class="bg-surface/40 border border-surface rounded-xl p-6 flex flex-col gap-6">
+          <div class="flex flex-col gap-1">
+            <span class="text-xs text-text-gray">Nome do Usuário:</span>
+            <span class="text-lg font-bold text-white">{{ nomeUsuario() }}</span>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <span class="text-xs text-text-gray">Saldo Atual:</span>
+            <span class="text-2xl font-extrabold text-primary">R$ {{ saldo().toFixed(2) }}</span>
+          </div>
+
+          <hr class="border-surface" />
+
+          <!-- ADICIONAR SALDO -->
+          <div class="flex flex-col gap-3">
+            <label class="text-xs font-semibold text-white">Adicionar Saldo à Carteira:</label>
+            <div class="flex gap-3">
+              <input 
+                #saldoInput
+                type="number" 
+                placeholder="R$ 50,00" 
+                class="bg-surface text-white p-3 rounded-lg text-sm outline-none border border-transparent focus:border-primary flex-1"
+              />
+              <button 
+                (click)="adicionarSaldo(saldoInput.value); saldoInput.value = ''"
+                class="bg-primary hover:bg-primary-hover text-white font-bold px-6 py-3 rounded-lg text-sm transition-colors cursor-pointer"
+              >
+                Adicionar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+  </main>
+</div>
+
+<!-- MODAL DETALHES JOGO -->
+@if (jogoSelecionado(); as jogo) {
+  <div class="fixed inset-0 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div class="bg-sidebar border border-surface rounded-2xl w-full max-w-lg p-6 flex flex-col gap-6 shadow-2xl relative">
+      <button (click)="fecharModal()" class="absolute top-4 right-4 text-text-gray hover:text-white text-xl cursor-pointer">✕</button>
+      <div class="h-56 w-full rounded-lg overflow-hidden bg-background">
+        <img [src]="jogo.capaUrl" [alt]="jogo.nome" class="w-full h-full object-cover" />
+      </div>
+      <div class="flex flex-col gap-2">
+        <h2 class="text-2xl font-bold text-white">{{ jogo.nome }}</h2>
+        <span class="text-2xl font-extrabold text-primary">R$ {{ jogo.preco.toFixed(2) }}</span>
+      </div>
+      <div class="flex justify-end gap-3 pt-2 border-t border-surface">
+        <button (click)="fecharModal()" class="bg-zinc-700 hover:bg-zinc-600 text-white text-xs font-semibold px-4 py-2.5 rounded-lg cursor-pointer">Cancelar</button>
+        <button (click)="comprarJogo(jogo)" class="bg-primary hover:bg-primary-hover text-white text-xs font-bold px-6 py-2.5 rounded-lg cursor-pointer">Confirmar Compra</button>
+      </div>
+    </div>
+  </div>
+}

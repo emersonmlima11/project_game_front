@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import {Router} from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { VisualizacaoSenha } from '../../../shared/services/visualizacao-senha';
 
 @Component({
   selector: 'app-cadastro',
@@ -7,10 +7,12 @@ import {Router} from '@angular/router';
   templateUrl: './cadastro.html',
   styleUrl: './cadastro.scss',
 })
-
 export class Cadastro {
-  constructor(private router: Router){
 
+  private visualizacao = inject(VisualizacaoSenha)
+  tipoSenha = signal('password')
+
+  toggleSenha(): void{
+    this.tipoSenha.update(type => this.visualizacao.toogleInputType(type))
   }
-
 }

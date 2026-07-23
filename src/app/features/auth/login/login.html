@@ -1,5 +1,46 @@
 <div class="min-h-screen bg-background flex flex-col items-center justify-center p-4 font-sans selection:bg-primary selection:text-background">
     <div class="w-full max-w-[400px] flex flex-col gap-6 transition-all duration-300">
-        
+        <h2 class="text-white text-center font-bold tracking-widest text-lg uppercase">Login</h2>
+        <form class="flex flex-col gap-4" (submit)="$event.preventDefault(); executarLogin(nomeInput.value, senhaInput.value)">
+            <input 
+            #nomeInput
+            type="text" 
+            placeholder="Nome de Usuário" 
+            class="w-full bg-surface text-white placeholder-text-gray px-4 py-3.5 rounded-lg border border-transparent focus:border-primary focus:outline-hidden transition-all duration-200 text-sm"
+            />
+            <div class="relative">
+                <input 
+                #senhaInput
+                id = "senha"
+                [type]="tipoSenha()" 
+                placeholder="Senha" 
+                class="w-full bg-surface text-white placeholder-text-gray px-4 py-3.5 rounded-lg border border-transparent focus:border-primary focus:outline-hidden transition-all duration-200 text-sm"
+                />
+                <button type="button" (click)="toggleSenha()" class="cursor-pointer absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700">
+                    <svg id="icone-olho" xmlns="http://w3.org" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.224 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.223 6.223A10.477 10.477 0 0112 4.5c4.776 0 8.774 3.162 10.066 7.5a10.477 10.477 0 01-1.464 2.863M6.223 6.223L3.98 3.98M15.48 15.48L20.25 20.25" />
+                    </svg>
+                </button>
+
+            </div>
+
+            <button 
+            type="submit" 
+            class="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3.5 rounded-lg transition-colors duration-200 text-sm cursor-pointer shadow-md shadow-primary/10 mt-2"
+            >
+            Entrar
+            </button>
+        </form>
+
+        <div class="flex items-center justify-center text-text-gray text-xs font-medium uppercase my-1">
+        ou
+        </div>
+
+        <button 
+        routerLink="/cadastro"
+        class="w-full bg-zinc-300 hover:bg-white text-neutral-900 font-semibold py-3.5 rounded-lg transition-colors duration-200 text-sm cursor-pointer shadow-md"
+        >
+        Criar Nova Conta
+      </button>
     </div>
 </div>
