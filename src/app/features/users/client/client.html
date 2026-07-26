@@ -50,7 +50,7 @@
       </nav>
     </div>
 
-    <!-- BOTÕES INFERIORES: ALTERNAR TEMA E SAIR -->
+    <!-- BOTÕES INFERIORES: SAIR -->
     <div class="mt-8 md:mt-0 pt-4 border-t border-surface flex flex-col gap-2">
       <button (click)="sair()" class="text-left py-2 px-3 text-sm text-text-gray hover:text-red-400 transition-colors cursor-pointer w-full">
         Sair
@@ -61,6 +61,18 @@
   <!-- ÁREA PRINCIPAL -->
   <main class="flex-1 p-6 md:p-12 overflow-y-auto">
 
+    <!-- MENSAGENS DE FEEDBACK GLOBAIS -->
+    @if (mensagemFeedback()) {
+      <div class="bg-primary/10 border border-primary/30 text-primary text-xs p-3 rounded-lg text-center mb-6">
+        {{ mensagemFeedback() }}
+      </div>
+    }
+    @if (mensagemErro()) {
+      <div class="bg-red-500/10 border border-red-500/30 text-red-400 text-xs p-3 rounded-lg text-center mb-6">
+        {{ mensagemErro() }}
+      </div>
+    }
+
     <!-- ABA 1: VITRINE DA LOJA -->
     @if (abaAtiva() === 'vitrine') {
       <div class="flex flex-col gap-8">
@@ -68,7 +80,7 @@
           <div>
             <h1 class="text-xs font-bold tracking-widest text-text-gray uppercase">VITRINE DA LOJA</h1>
             <div class="text-primary font-bold text-xl mt-1">
-              Seu Saldo: R$ {{ saldo().toFixed(2) }}
+              Seu Saldo: R$ {{ saldoUsuario().toFixed(2) }}
             </div>
           </div>
 
@@ -81,43 +93,60 @@
           />
         </div>
 
-        @if (jogosFiltrados().length > 0) {
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        @if (carregandoJogos()) {
+          <div class="w-full min-h-[200px] flex items-center justify-center">
+            <div class="flex items-center gap-2 text-text-gray text-sm">
+              <svg class="animate-spin h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              Carregando vitrine...
+            </div>
+          </div>
+        } @else if (jogosFiltrados().length > 0) {
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @for (jogo of jogosFiltrados(); track jogo.id) {
-            <div class="bg-surface/50 border border-surface hover:border-primary/50 rounded-xl overflow-hidden transition-all duration-300 flex flex-col group">
+              <div class="bg-surface/50 border border-surface hover:border-primary/50 rounded-xl overflow-hidden transition-all duration-300 flex flex-col group">
                 <div class="h-48 w-full overflow-hidden bg-background relative">
-                <img [src]="jogo.capaUrl" [alt]="jogo.nome" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  @if (jogo.urlImagem) {
+                    <img [src]="jogo.urlImagem" [alt]="jogo.nome" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  } @else {
+                    <div class="w-full h-full flex items-center justify-center text-text-gray text-xs">Sem imagem</div>
+                  }
                 </div>
 
                 <div class="p-4 flex flex-col gap-3 flex-1 justify-between">
-                <div>
+                  <div>
                     <h3 class="font-bold text-white text-base leading-tight">{{ jogo.nome }}</h3>
                     <span class="text-lg font-extrabold text-primary mt-1 block">R$ {{ jogo.preco.toFixed(2) }}</span>
-                </div>
+                  </div>
 
-                <div class="grid grid-cols-2 gap-2 mt-2">
+                  <div class="grid grid-cols-2 gap-2 mt-2">
                     <button (click)="abrirDetalhes(jogo)" class="bg-zinc-700 hover:bg-zinc-600 text-white text-xs font-semibold py-2 rounded transition-colors cursor-pointer">
-                    Detalhes
+                      Detalhes
                     </button>
-                    <button (click)="comprarJogo(jogo)" class="bg-primary hover:bg-primary-hover text-white text-xs font-bold py-2 rounded transition-colors cursor-pointer">
-                    Comprar
+                    <button (click)="comprarJogo(jogo)" [disabled]="comprando()" class="bg-primary hover:bg-primary-hover text-white text-xs font-bold py-2 rounded transition-colors cursor-pointer disabled:opacity-50">
+                      Comprar
                     </button>
+                  </div>
                 </div>
-                </div>
-            </div>
+              </div>
             }
-        </div>
-        } 
-        <!-- Mensagem elegante de quando nenhum jogo for encontrado -->
-        @else {
-        <div class="w-full bg-surface/30 border border-surface/50 rounded-xl p-12 text-center text-text-gray text-sm">
-            Nenhum jogo encontrado para <strong class="text-white">"{{ termoBusca() }}"</strong>.
-        </div>
+          </div>
+        } @else {
+          <!-- Mensagem quando nenhum jogo for encontrado -->
+          <div class="w-full bg-surface/30 border border-surface/50 rounded-xl p-12 text-center text-text-gray text-sm">
+            @if (termoBusca()) {
+              Nenhum jogo encontrado para <strong class="text-white">"{{ termoBusca() }}"</strong>.
+            } @else {
+              Nenhum jogo disponível na vitrine no momento.
+            }
+          </div>
         }
       </div>
     }
 
-    <!-- ABA 2: MEUS DADOS E ADICIONAR SALDO -->
+    <!-- ABA 2: MEUS DADOS -->
     @if (abaAtiva() === 'meus-dados') {
       <div class="max-w-xl flex flex-col gap-6">
         <h1 class="text-xs font-bold tracking-widest text-text-gray uppercase">MEUS DADOS</h1>
@@ -130,28 +159,7 @@
 
           <div class="flex flex-col gap-1">
             <span class="text-xs text-text-gray">Saldo Atual:</span>
-            <span class="text-2xl font-extrabold text-primary">R$ {{ saldo().toFixed(2) }}</span>
-          </div>
-
-          <hr class="border-surface" />
-
-          <!-- ADICIONAR SALDO -->
-          <div class="flex flex-col gap-3">
-            <label class="text-xs font-semibold text-white">Adicionar Saldo à Carteira:</label>
-            <div class="flex gap-3">
-              <input 
-                #saldoInput
-                type="number" 
-                placeholder="R$ 50,00" 
-                class="bg-surface text-white p-3 rounded-lg text-sm outline-none border border-transparent focus:border-primary flex-1"
-              />
-              <button 
-                (click)="adicionarSaldo(saldoInput.value); saldoInput.value = ''"
-                class="bg-primary hover:bg-primary-hover text-white font-bold px-6 py-3 rounded-lg text-sm transition-colors cursor-pointer"
-              >
-                Adicionar
-              </button>
-            </div>
+            <span class="text-2xl font-extrabold text-primary">R$ {{ saldoUsuario().toFixed(2) }}</span>
           </div>
         </div>
       </div>
@@ -166,15 +174,28 @@
     <div class="bg-sidebar border border-surface rounded-2xl w-full max-w-lg p-6 flex flex-col gap-6 shadow-2xl relative">
       <button (click)="fecharModal()" class="absolute top-4 right-4 text-text-gray hover:text-white text-xl cursor-pointer">✕</button>
       <div class="h-56 w-full rounded-lg overflow-hidden bg-background">
-        <img [src]="jogo.capaUrl" [alt]="jogo.nome" class="w-full h-full object-cover" />
+        @if (jogo.urlImagem) {
+          <img [src]="jogo.urlImagem" [alt]="jogo.nome" class="w-full h-full object-cover" />
+        } @else {
+          <div class="w-full h-full flex items-center justify-center text-text-gray text-sm">Sem imagem disponível</div>
+        }
       </div>
       <div class="flex flex-col gap-2">
         <h2 class="text-2xl font-bold text-white">{{ jogo.nome }}</h2>
+        @if (jogo.descricao) {
+          <p class="text-sm text-text-gray">{{ jogo.descricao }}</p>
+        }
         <span class="text-2xl font-extrabold text-primary">R$ {{ jogo.preco.toFixed(2) }}</span>
       </div>
       <div class="flex justify-end gap-3 pt-2 border-t border-surface">
         <button (click)="fecharModal()" class="bg-zinc-700 hover:bg-zinc-600 text-white text-xs font-semibold px-4 py-2.5 rounded-lg cursor-pointer">Cancelar</button>
-        <button (click)="comprarJogo(jogo)" class="bg-primary hover:bg-primary-hover text-white text-xs font-bold px-6 py-2.5 rounded-lg cursor-pointer">Confirmar Compra</button>
+        <button (click)="comprarJogo(jogo)" [disabled]="comprando()" class="bg-primary hover:bg-primary-hover text-white text-xs font-bold px-6 py-2.5 rounded-lg cursor-pointer disabled:opacity-50">
+          @if (comprando()) {
+            Processando...
+          } @else {
+            Confirmar Compra
+          }
+        </button>
       </div>
     </div>
   </div>
