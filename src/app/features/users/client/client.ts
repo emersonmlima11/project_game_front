@@ -31,7 +31,7 @@ export class Client {
       nome: 'Cyberpunk 2077', 
       preco: 199.90, 
       categoria: "tal", // Corresponde ao enum TipoJogo (ex: RPG)
-      capaUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500', 
+      urlImagem: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500', 
       descricao: "asdasdasdada"
     },
     { 
@@ -39,7 +39,7 @@ export class Client {
       nome: 'Elden Ring', 
       preco: 249.00, 
       categoria: "", // Corresponde ao enum TipoJogo (ex: ACAO)
-      capaUrl: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=500' ,
+      urlImagem: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=500' ,
       descricao: ""
     }
   ]);
