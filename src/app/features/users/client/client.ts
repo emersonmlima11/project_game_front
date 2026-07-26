@@ -1,8 +1,9 @@
-import { Component, signal, computed} from '@angular/core';
+import { Component, signal, computed, inject} from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Jogo } from '../../../core/models/app.models';
+import { Jogo, JogoModel } from '../../../core/models/app.models';
 export type ClienteTab = 'vitrine' | 'meus-dados';
+import { JogoService } from '../../../shared/services/jogo-service';
 
 @Component({
   selector: 'app-client',
@@ -13,6 +14,9 @@ export type ClienteTab = 'vitrine' | 'meus-dados';
 
 
 export class Client {
+
+  private jogoService = inject(JogoService)
+
   abaAtiva = signal<ClienteTab>('vitrine');
   saldo = signal<number>(4000.00);
   menuMobileAberto = signal(false);
@@ -21,22 +25,25 @@ export class Client {
   termoBusca = signal<string>('');
   
   // 2. Use a interface Jogo oficial
-  jogos = signal<Jogo[]>([
+  jogos = signal<JogoModel[]>([
     { 
-      id: '1', 
+      id: 1, 
       nome: 'Cyberpunk 2077', 
       preco: 199.90, 
-      categoria: 2, // Corresponde ao enum TipoJogo (ex: RPG)
-      capaUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500' 
+      categoria: "tal", // Corresponde ao enum TipoJogo (ex: RPG)
+      capaUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500', 
+      descricao: "asdasdasdada"
     },
     { 
-      id: '2', 
+      id: 2, 
       nome: 'Elden Ring', 
       preco: 249.00, 
-      categoria: 0, // Corresponde ao enum TipoJogo (ex: ACAO)
-      capaUrl: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=500' 
+      categoria: "", // Corresponde ao enum TipoJogo (ex: ACAO)
+      capaUrl: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=500' ,
+      descricao: ""
     }
   ]);
+
 
   jogosFiltrados = computed(() => {
     const termo = this.termoBusca().toLowerCase().trim();
@@ -53,7 +60,7 @@ export class Client {
   });
 
   // Modal de Detalhes
-  jogoSelecionado = signal<Jogo | null>(null);
+  jogoSelecionado = signal<JogoModel | null>(null);
   constructor(private router: Router) {}
 
   mudarAba(aba: ClienteTab): void {
@@ -61,7 +68,7 @@ export class Client {
     this.menuMobileAberto.set(false);
   }
 
-  abrirDetalhes(jogo: Jogo): void {
+  abrirDetalhes(jogo: JogoModel): void {
     this.jogoSelecionado.set(jogo);
   }
 
@@ -69,7 +76,7 @@ export class Client {
     this.jogoSelecionado.set(null);
   }
 
-  comprarJogo(jogo: Jogo): void {
+  comprarJogo(jogo: JogoModel): void {
     if (this.saldo() >= jogo.preco) {
       this.saldo.update(s => s - jogo.preco);
       alert(`Você comprou "${jogo.nome}" com sucesso! 🎉`);

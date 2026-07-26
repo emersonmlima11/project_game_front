@@ -1,7 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Jogo } from '../../../core/models/app.models';
-
+import { Jogo, JogoModel } from '../../../core/models/app.models';
+import { JogoService } from '../../../shared/services/jogo-service';
 export type AdminTab = 'cadastrar-jogo' | 'gerenciar-jogos' |'cadastrar-usuario' | 'historico-vendas';
 
 @Component({
@@ -13,22 +13,27 @@ export type AdminTab = 'cadastrar-jogo' | 'gerenciar-jogos' |'cadastrar-usuario'
 
 export class User {
 
+  private jogosServices = inject(JogoService)
+
   abaAtiva = signal<AdminTab>('cadastrar-jogo');
 
   menuMobileAberto = signal(false);
 
   imagemPreviewUrl = signal<string | null>(null);
 
-  jogoParaEditar = signal<Jogo | null>(null);
-  jogoParaRemover = signal<Jogo | null>(null);
+  jogoParaEditar = signal<JogoModel | null>(null);
+  jogoParaRemover = signal<JogoModel | null>(null);
 
-  jogos = signal<Jogo[]>([
-    { id: '1', nome: 'Cyberpunk 2077', preco: 199.90, categoria: 2, capaUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500' },
-    { id: '2', nome: 'Elden Ring', preco: 249.00, categoria: 0, capaUrl: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=500' }
+  jogos = signal<JogoModel[]>([
+    { id: 1, nome: 'Cyberpunk 2077', preco: 199.90, categoria: "", capaUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500', descricao: "" },
+    { id: 2, nome: 'Elden Ring', preco: 249.00, categoria: "", capaUrl: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=500', descricao: "" }
   ]);
 
   constructor(private router: Router){
-
+    this.jogosServices.buscarJogos().subscribe((res: JogoModel[]) => {
+    this.jogos.set(res);
+    })
+    
   }
 
   mudarAba(aba: AdminTab):void{
@@ -36,7 +41,7 @@ export class User {
     this.menuMobileAberto.set(false);
   }
 
-  abrirModalRemover(jogo: Jogo): void {
+  abrirModalRemover(jogo: JogoModel): void {
     this.jogoParaRemover.set(jogo);
   }
 
@@ -49,7 +54,7 @@ export class User {
     }
   }
 
-  abrirModalEditar(jogo: Jogo): void {
+  abrirModalEditar(jogo: JogoModel): void {
     // Passamos uma cópia do objeto para não alterar o sinal antes de salvar
     this.jogoParaEditar.set({ ...jogo });
   }

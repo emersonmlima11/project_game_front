@@ -97,15 +97,17 @@
 
               <div class="flex flex-col gap-1.5">
                 <label class="text-white text-xs font-medium">Categoria:</label>
-                <select class="bg-surface text-white p-3 rounded-lg text-sm outline-none border border-transparent focus:border-primary transition-all">
-                  <option value="">Selecione a Categoria</option>
-                  <option value="ACAO">Ação</option>
-                  <option value="AVENTURA">Aventura</option>
-                  <option value="RPG">RPG</option>
-                  <option value="ESPORTE">Esporte</option>
-                  <option value="INDIE">Indie</option>
-                  <option value="ESTRATEGIA">Estratégia</option>
-                </select>
+                <input type="text" placeholder="Ex: Ação" class="bg-surface text-white p-3 rounded-lg text-sm outline-none border border-transparent focus:border-primary transition-all" />
+              </div>
+
+              <div class="flex flex-col gap-1.5">
+                <label class="text-white text-xs font-medium">Des:</label>
+                <textarea
+                id="descricao"
+                rows="3"
+                class="bg-surface text-white p-3 rounded-lg text-sm outline-none border border-transparent focus:border-primary transition-all"
+                placeholder="Escreva os detalhes aqui..."
+              ></textarea>
               </div>
             </div>
 
@@ -142,12 +144,12 @@
           @for (jogo of jogos(); track jogo.id) {
             <div class="bg-surface/50 border border-surface rounded-xl overflow-hidden flex flex-col">
               <div class="h-44 w-full bg-background overflow-hidden">
-                <img [src]="jogo.capaUrl" [alt]="jogo.nome" class="w-full h-full object-cover" />
+                <img [src]="jogo.urlImagem" [alt]="jogo.nome" class="w-full h-full object-cover" />
               </div>
               <div class="p-4 flex flex-col gap-3 flex-1 justify-between">
                 <div>
                   <h3 class="font-bold text-white text-base">{{ jogo.nome }}</h3>
-                  <span class="text-lg font-extrabold text-primary block mt-1">R$ {{ jogo.preco.toFixed(2) }}</span>
+                  <span class="text-lg font-extrabold text-primary block mt-1">R$ {{ jogo.preco.toFixed(2) }}</span>  
                 </div>
                 <div class="grid grid-cols-2 gap-2 mt-2">
                   <button (click)="abrirModalEditar(jogo)" class="bg-zinc-700 hover:bg-zinc-600 text-white text-xs font-semibold py-2 rounded cursor-pointer">
@@ -243,6 +245,15 @@
         <div class="flex flex-col gap-1">
           <label class="text-xs text-text-gray">Preço (R$):</label>
           <input #editPreco type="number" [value]="jogo.preco" class="bg-surface text-white p-3 rounded-lg text-sm outline-none border border-transparent focus:border-primary" />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-xs text-text-gray">Categoria do jogo:</label>
+          <input #editcategoria type="text" [value]="jogo.categoria" class="bg-surface text-white p-3 rounded-lg text-sm outline-none border border-transparent focus:border-primary" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-xs text-text-gray">Descrição do jogo:</label>
+          <textarea #editdescricao type="text" [value]="jogo.descricao" class="bg-surface text-white p-3 rounded-lg text-sm outline-none border border-transparent focus:border-primary" ></textarea>
         </div>
       </div>
 

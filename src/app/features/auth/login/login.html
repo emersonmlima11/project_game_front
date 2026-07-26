@@ -1,18 +1,29 @@
 <div class="min-h-screen bg-background flex flex-col items-center justify-center p-4 font-sans selection:bg-primary selection:text-background">
     <div class="w-full max-w-[400px] flex flex-col gap-6 transition-all duration-300">
         <h2 class="text-white text-center font-bold tracking-widest text-lg uppercase">Login</h2>
-        <form class="flex flex-col gap-4" (submit)="$event.preventDefault(); executarLogin(nomeInput.value, senhaInput.value)">
+        
+        @if (mensagemErro()) {
+        <div class="bg-red-500/10 border border-red-500/30 text-red-400 text-xs p-3 rounded-lg text-center">
+            {{ mensagemErro() }}
+        </div>
+        }
+
+        <form class="flex flex-col gap-4" (submit)="$event.preventDefault(); fazerLogin()">
+
             <input 
-            #nomeInput
-            type="text" 
-            placeholder="Nome de Usuário" 
+            [value]="email()"
+            (input)="email.set($any($event.target).value)"
+            type="email" 
+            placeholder="Email do Usuário" 
             class="w-full bg-surface text-white placeholder-text-gray px-4 py-3.5 rounded-lg border border-transparent focus:border-primary focus:outline-hidden transition-all duration-200 text-sm"
             />
             <div class="relative">
                 <input 
                 #senhaInput
                 id = "senha"
-                [type]="tipoSenha()" 
+                [type]="tipoSenha()"
+                [value]="senha()"
+                (input)="senha.set($any($event.target).value)"
                 placeholder="Senha" 
                 class="w-full bg-surface text-white placeholder-text-gray px-4 py-3.5 rounded-lg border border-transparent focus:border-primary focus:outline-hidden transition-all duration-200 text-sm"
                 />
