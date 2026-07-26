@@ -1,29 +1,59 @@
 <div class="min-h-screen bg-background flex flex-col items-center justify-center p-4 font-sans selection:bg-primary selection:text-background">
     <div class="w-full max-w-[400px] flex flex-col gap-6 transition-all duration-300">
         <h2 class="text-white text-center font-bold tracking-widest text-lg uppercase">CADASTRE-SE</h2>
-        <form class="flex flex-col gap-4" (submit)="$event.preventDefault();">
+
+        <!-- Mensagem de sucesso após cadastro -->
+        @if (mensagemSucesso()) {
+        <div class="bg-primary/10 border border-primary/30 text-primary text-xs p-3 rounded-lg text-center">
+            {{ mensagemSucesso() }}
+        </div>
+        }
+
+        <!-- Mensagem de erro quando o cadastro falha -->
+        @if (mensagemErro()) {
+        <div class="bg-red-500/10 border border-red-500/30 text-red-400 text-xs p-3 rounded-lg text-center">
+            {{ mensagemErro() }}
+        </div>
+        }
+
+        <form class="flex flex-col gap-4" (submit)="$event.preventDefault(); cadastrar()">
+            <!-- Campo Nome -->
             <div class="flex flex-col gap-1.5">
             <label class="text-white text-xs font-semibold">Nome:</label>
             <input 
                 type="text" 
-                class="w-full bg-surface text-white placeholder-text-gray px-4 py-3.5 rounded-lg border border-transparent focus:border-primary focus:outline-hidden transition-all duration-200 text-sm"
+                [value]="nome()"
+                (input)="nome.set($any($event.target).value)"
+                [disabled]="carregando()"
+                placeholder="Seu nome completo"
+                class="w-full bg-surface text-white placeholder-text-gray px-4 py-3.5 rounded-lg border border-transparent focus:border-primary focus:outline-hidden transition-all duration-200 text-sm disabled:opacity-50"
             />
             </div>
             
+            <!-- Campo Email -->
             <div class="flex flex-col gap-1.5">
             <label class="text-white text-xs font-semibold">Email:</label>
             <input 
-                type="text" 
-                class="w-full bg-surface text-white placeholder-text-gray px-4 py-3.5 rounded-lg border border-transparent focus:border-primary focus:outline-hidden transition-all duration-200 text-sm"
+                type="email" 
+                [value]="email()"
+                (input)="email.set($any($event.target).value)"
+                [disabled]="carregando()"
+                placeholder="seu@email.com"
+                class="w-full bg-surface text-white placeholder-text-gray px-4 py-3.5 rounded-lg border border-transparent focus:border-primary focus:outline-hidden transition-all duration-200 text-sm disabled:opacity-50"
             />
             </div>
 
+            <!-- Campo Senha com toggle de visibilidade -->
             <div class="flex flex-col gap-1.5">
                 <label class="text-white text-xs font-semibold">Senha:</label>
                 <div class="relative">
                     <input 
                     [type]="tipoSenha()" 
-                    class="w-full bg-surface text-white placeholder-text-gray px-4 py-3.5 rounded-lg border border-transparent focus:border-primary focus:outline-hidden transition-all duration-200 text-sm"
+                    [value]="senha()"
+                    (input)="senha.set($any($event.target).value)"
+                    [disabled]="carregando()"
+                    placeholder="Mínimo 6 caracteres"
+                    class="w-full bg-surface text-white placeholder-text-gray px-4 py-3.5 rounded-lg border border-transparent focus:border-primary focus:outline-hidden transition-all duration-200 text-sm disabled:opacity-50"
                     />
                     <button type="button" (click)="toggleSenha()" class="cursor-pointer absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700">
                         <svg id="icone-olho" xmlns="http://w3.org" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -33,22 +63,51 @@
                 </div>
             </div>
 
+            <!-- Campo Saldo Inicial -->
             <div class="flex flex-col gap-1.5">
             <label class="text-white text-xs font-semibold">Saldo Inicial (R$):</label>
             <input 
                 type="number" 
-                class="w-full bg-surface text-white placeholder-text-gray px-4 py-3.5 rounded-lg border border-transparent focus:border-primary focus:outline-hidden transition-all duration-200 text-sm"
+                [value]="saldo()"
+                (input)="saldo.set($any($event.target).value)"
+                [disabled]="carregando()"
+                placeholder="Ex: 100.00"
+                min="0"
+                step="0.01"
+                class="w-full bg-surface text-white placeholder-text-gray px-4 py-3.5 rounded-lg border border-transparent focus:border-primary focus:outline-hidden transition-all duration-200 text-sm disabled:opacity-50"
             />
             </div>
 
+            <!-- Botão de cadastro com estado de loading -->
             <button 
             type="submit" 
-            class="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3.5 rounded-lg transition-colors duration-200 text-sm cursor-pointer shadow-md shadow-primary/10 mt-2"
+            [disabled]="carregando()"
+            class="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3.5 rounded-lg transition-colors duration-200 text-sm cursor-pointer shadow-md shadow-primary/10 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-            Cadastrar
+            @if (carregando()) {
+                <span class="flex items-center justify-center gap-2">
+                    <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    Cadastrando...
+                </span>
+            } @else {
+                Cadastrar
+            }
             </button>
 
         </form>
+
+        <!-- Link para voltar ao login -->
+        <div class="flex items-center justify-center">
+            <button 
+            routerLink="/login"
+            class="text-text-gray text-xs hover:text-white transition-colors cursor-pointer"
+            >
+            Já tem uma conta? <span class="text-primary font-semibold">Entrar</span>
+            </button>
+        </div>
 
     </div>
 </div>
