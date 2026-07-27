@@ -15,9 +15,10 @@ import { JogoModel, CompraRequestModel } from '../../../core/models/app.models';
 import { JogoService } from '../../../shared/services/jogo-service';
 import { CompraService } from '../../../shared/services/compra-service';
 import { AuthService } from '../../../shared/services/auth-service';
+import { UsuarioService } from '../../../shared/services/usuario-service';
 
 /** Tipos possíveis das abas do painel cliente */
-export type ClienteTab = 'vitrine' | 'meus-dados';
+export type ClienteTab = 'vitrine' | 'biblioteca' | 'meus-dados';
 
 @Component({
   selector: 'app-client',
@@ -32,6 +33,7 @@ export class Client implements OnInit {
   private jogoService = inject(JogoService);
   private compraService = inject(CompraService);
   private authService = inject(AuthService);
+  private usuarioService = inject(UsuarioService);
   private router = inject(Router);
 
   // ─────────────────────────────────────────────────────────
@@ -98,14 +100,47 @@ export class Client implements OnInit {
   });
 
   // ─────────────────────────────────────────────────────────
+  // ESTADO: MINHA BIBLIOTECA
+  // ─────────────────────────────────────────────────────────
+
+  /** Lista de jogos adquiridos pelo usuário logado */
+  bibliotecaJogos = signal<JogoModel[]>([]);
+  /** Indica se a biblioteca de jogos está sendo carregada */
+  carregandoBiblioteca = signal(false);
+  /** Termo de busca para filtrar jogos na biblioteca */
+  termoBuscaBiblioteca = signal<string>('');
+
+  /**
+   * Computed signal que filtra a lista da biblioteca pelo termo de busca.
+   */
+  bibliotecaFiltrada = computed(() => {
+    const termo = this.termoBuscaBiblioteca().toLowerCase().trim();
+    if (!termo) {
+      return this.bibliotecaJogos();
+    }
+    return this.bibliotecaJogos().filter(jogo =>
+      jogo.nome.toLowerCase().includes(termo)
+    );
+  });
+
+  /**
+   * Verifica se o usuário já possui um determinado jogo na sua biblioteca.
+   * @param jogoId - ID do jogo a ser verificado.
+   */
+  jaPossuiJogo(jogoId: number): boolean {
+    return this.bibliotecaJogos().some(j => j.id === jogoId);
+  }
+
+  // ─────────────────────────────────────────────────────────
   // LIFECYCLE
   // ─────────────────────────────────────────────────────────
 
   /**
-   * Carrega a lista de jogos da API ao inicializar o componente.
+   * Carrega a lista de jogos da vitrine e da biblioteca ao inicializar o componente.
    */
   ngOnInit(): void {
     this.carregarJogos();
+    this.carregarBiblioteca();
   }
 
   // ─────────────────────────────────────────────────────────
@@ -197,6 +232,8 @@ export class Client implements OnInit {
             localStorage.setItem('usuario_logado', JSON.stringify(usuario));
           }
         });
+        // Atualiza a biblioteca de jogos do usuário instantaneamente
+        this.carregarBiblioteca();
       },
       error: (err) => {
         this.comprando.set(false);
@@ -205,6 +242,40 @@ export class Client implements OnInit {
         this.mensagemErro.set(typeof mensagem === 'string' ? mensagem : 'Erro ao realizar compra.');
       }
     });
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // MINHA BIBLIOTECA
+  // ─────────────────────────────────────────────────────────
+
+  /**
+   * Carrega a biblioteca de jogos adquiridos pelo usuário logado via API.
+   * Rota protegida: GET /api/v1/usuarios/:id/jogos
+   */
+  private carregarBiblioteca(): void {
+    const currentUserId = this.userId();
+    if (!currentUserId) return;
+
+    this.carregandoBiblioteca.set(true);
+    this.usuarioService.listarJogosDoUsuario(currentUserId).subscribe({
+      next: (jogos) => {
+        this.bibliotecaJogos.set(jogos);
+        this.carregandoBiblioteca.set(false);
+      },
+      error: () => {
+        this.carregandoBiblioteca.set(false);
+        this.mensagemErro.set('Erro ao carregar sua biblioteca de jogos.');
+      }
+    });
+  }
+
+  /**
+   * Ação ao clicar em "Jogar" num jogo da biblioteca.
+   * Exibe mensagem interativa de lançamento do jogo.
+   * @param jogo - Jogo selecionado na biblioteca.
+   */
+  jogarJogo(jogo: JogoModel): void {
+    this.mensagemFeedback.set(`Iniciando "${jogo.nome}"... Boa diversão! 🎮`);
   }
 
   // ─────────────────────────────────────────────────────────
