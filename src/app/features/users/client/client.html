@@ -6,8 +6,8 @@
       <div class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></div>
       <span class="font-bold text-xs tracking-wider uppercase text-white">GameStore</span>
     </div>
-    <button 
-      (click)="menuMobileAberto.set(!menuMobileAberto())" 
+    <button
+      (click)="menuMobileAberto.set(!menuMobileAberto())"
       class="text-text-gray hover:text-white p-1 text-lg focus:outline-none transition-colors"
     >
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-6 h-6">
@@ -17,7 +17,7 @@
   </div>
 
   <!-- SIDEBAR LATERAL DO CLIENTE -->
-  <aside 
+  <aside
     [class.hidden]="!menuMobileAberto()"
     class="w-full md:w-64 bg-sidebar border-r border-surface p-6 flex flex-col justify-between shrink-0 md:block transition-all"
   >
@@ -30,7 +30,7 @@
 
       <!-- NAVEGAÇÃO CLIENTE -->
       <nav class="flex flex-col gap-1 mt-2">
-        <button 
+        <button
           (click)="mudarAba('vitrine')"
           [class.text-primary]="abaAtiva() === 'vitrine'"
           [class.font-bold]="abaAtiva() === 'vitrine'"
@@ -39,7 +39,7 @@
           Vitrine da Loja
         </button>
 
-        <button 
+        <button
           (click)="mudarAba('biblioteca')"
           [class.text-primary]="abaAtiva() === 'biblioteca'"
           [class.font-bold]="abaAtiva() === 'biblioteca'"
@@ -51,7 +51,7 @@
           }
         </button>
 
-        <button 
+        <button
           (click)="mudarAba('meus-dados')"
           [class.text-primary]="abaAtiva() === 'meus-dados'"
           [class.font-bold]="abaAtiva() === 'meus-dados'"
@@ -96,9 +96,9 @@
             </div>
           </div>
 
-          <input 
-            type="text" 
-            placeholder="Pesquisar jogo por nome..." 
+          <input
+            type="text"
+            placeholder="Pesquisar jogo por nome..."
             [value]="termoBusca()"
             (input)="termoBusca.set($any($event.target).value)"
             class="bg-surface text-white placeholder-text-gray text-sm px-4 py-2.5 rounded-full w-full md:w-80 outline-none border border-transparent focus:border-primary"
@@ -183,9 +183,9 @@
             </div>
           </div>
 
-          <input 
-            type="text" 
-            placeholder="Pesquisar em seus jogos..." 
+          <input
+            type="text"
+            placeholder="Pesquisar em seus jogos..."
             [value]="termoBuscaBiblioteca()"
             (input)="termoBuscaBiblioteca.set($any($event.target).value)"
             class="bg-surface text-white placeholder-text-gray text-sm px-4 py-2.5 rounded-full w-full md:w-80 outline-none border border-transparent focus:border-primary"
@@ -250,8 +250,8 @@
                 <h3 class="text-white font-bold text-base">Sua biblioteca está vazia</h3>
                 <p class="text-text-gray text-xs">Você ainda não adquiriu nenhum jogo. Explore nossa vitrine e comece sua coleção agora mesmo!</p>
               </div>
-              <button 
-                (click)="mudarAba('vitrine')" 
+              <button
+                (click)="mudarAba('vitrine')"
                 class="bg-primary hover:bg-primary-hover text-white text-xs font-bold px-6 py-3 rounded-lg transition-colors cursor-pointer mt-2"
               >
                 Explorar a Vitrine
@@ -264,18 +264,97 @@
 
     <!-- ABA 2: MEUS DADOS -->
     @if (abaAtiva() === 'meus-dados') {
-      <div class="max-w-xl flex flex-col gap-6">
-        <h1 class="text-xs font-bold tracking-widest text-text-gray uppercase">MEUS DADOS</h1>
+      <div class="max-w-2xl flex flex-col gap-8">
+        <div>
+          <h1 class="text-xs font-bold tracking-widest text-text-gray uppercase">MEUS DADOS & CARTEIRA</h1>
+          <h2 class="text-white font-bold text-2xl mt-1">Gerencie sua conta e adicione fundos</h2>
+        </div>
 
-        <div class="bg-surface/40 border border-surface rounded-xl p-6 flex flex-col gap-6">
+        @if (mensagemSaldo()) {
+          <div class="bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 px-4 py-3 rounded-xl flex items-center gap-3 animate-fade-in">
+            <span class="text-lg">🎉</span>
+            <span class="text-sm font-semibold">{{ mensagemSaldo() }}</span>
+          </div>
+        }
+
+        @if (mensagemErroSaldo()) {
+          <div class="bg-red-500/20 border border-red-500/50 text-red-300 px-4 py-3 rounded-xl flex items-center gap-3 animate-fade-in">
+            <span class="text-lg">⚠️</span>
+            <span class="text-sm font-semibold">{{ mensagemErroSaldo() }}</span>
+          </div>
+        }
+
+        <!-- Resumo da Carteira e Dados -->
+        <div class="bg-surface/40 border border-surface rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
           <div class="flex flex-col gap-1">
-            <span class="text-xs text-text-gray">Nome do Usuário:</span>
+            <span class="text-xs text-text-gray uppercase font-semibold">Nome do Usuário</span>
             <span class="text-lg font-bold text-white">{{ nomeUsuario() }}</span>
           </div>
 
-          <div class="flex flex-col gap-1">
-            <span class="text-xs text-text-gray">Saldo Atual:</span>
-            <span class="text-2xl font-extrabold text-primary">R$ {{ saldoUsuario().toFixed(2) }}</span>
+          <div class="flex flex-col sm:items-end gap-1">
+            <span class="text-xs text-text-gray uppercase font-semibold">Saldo Atual na Carteira</span>
+            <span class="text-3xl font-extrabold text-primary">R$ {{ saldoUsuario().toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <!-- Seção de Adicionar Saldo -->
+        <div class="bg-surface/30 border border-surface rounded-2xl p-6 flex flex-col gap-6">
+          <div>
+            <h3 class="text-white font-bold text-lg">Adicionar Saldo à Carteira</h3>
+            <p class="text-text-gray text-xs mt-0.5">Selecione uma quantia ou informe um valor personalizado para usar nas compras.</p>
+          </div>
+
+          <!-- Opções rápidas de recarga -->
+          <div class="flex flex-col gap-2">
+            <span class="text-xs font-semibold text-text-gray uppercase tracking-wider">Recarga Rápida</span>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              @for (valor of [20, 50, 100, 250]; track valor) {
+                <button 
+                  type="button"
+                  (click)="valorAdicionarSaldo.set(valor)"
+                  [class]="valorAdicionarSaldo() === valor ? 'bg-primary/20 border-primary text-primary font-bold' : 'bg-surface/50 border-surface text-white hover:border-text-gray font-medium'"
+                  class="border rounded-xl py-3 px-4 text-sm transition-all cursor-pointer flex flex-col items-center justify-center"
+                >
+                  + R$ {{ valor.toFixed(2) }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Valor personalizado e Ação -->
+          <div class="flex flex-col gap-2 pt-2 border-t border-surface/50">
+            <label class="text-xs font-semibold text-text-gray uppercase tracking-wider">Valor da Recarga (R$)</label>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <input 
+                type="number" 
+                min="1" 
+                step="any"
+                placeholder="Ex: 50.00" 
+                [value]="valorAdicionarSaldo()"
+                (input)="valorAdicionarSaldo.set(+$any($event.target).value)"
+                class="bg-surface text-white placeholder-text-gray text-base px-4 py-3 rounded-xl flex-1 outline-none border border-surface focus:border-primary font-semibold"
+              />
+
+              <button 
+                type="button"
+                (click)="adicionarSaldoCarteira()"
+                [disabled]="adicionandoSaldo() || valorAdicionarSaldo() <= 0"
+                class="bg-primary hover:bg-primary-hover text-white font-bold px-8 py-3 rounded-xl transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
+              >
+                @if (adicionandoSaldo()) {
+                  <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                  </svg>
+                  Adicionando...
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z" clip-rule="evenodd" />
+                  </svg>
+                  Adicionar Saldo
+                }
+              </button>
+            </div>
           </div>
         </div>
       </div>

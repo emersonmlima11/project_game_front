@@ -1,0 +1,114 @@
+[1mdiff --git a/src/app/features/users/client/client.html b/src/app/features/users/client/client.html[m
+[1mindex fa3f859..1d65c3c 100644[m
+[1m--- a/src/app/features/users/client/client.html[m
+[1m+++ b/src/app/features/users/client/client.html[m
+[36m@@ -6,8 +6,8 @@[m
+       <div class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></div>[m
+       <span class="font-bold text-xs tracking-wider uppercase text-white">GameStore</span>[m
+     </div>[m
+[31m-    <button [m
+[31m-      (click)="menuMobileAberto.set(!menuMobileAberto())" [m
+[32m+[m[32m    <button[m
+[32m+[m[32m      (click)="menuMobileAberto.set(!menuMobileAberto())"[m
+       class="text-text-gray hover:text-white p-1 text-lg focus:outline-none transition-colors"[m
+     >[m
+       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-6 h-6">[m
+[36m@@ -17,12 +17,12 @@[m
+   </div>[m
+ [m
+   <!-- SIDEBAR LATERAL DO CLIENTE -->[m
+[31m-  <aside [m
+[32m+[m[32m  <aside[m
+     [class.hidden]="!menuMobileAberto()"[m
+     class="w-full md:w-64 bg-sidebar border-r border-surface p-6 flex flex-col justify-between shrink-0 md:block transition-all"[m
+   >[m
+     <div class="flex flex-col gap-6">[m
+[31m-      <!-- SÍMBOLO PULSANTE GAMESTORE -->[m
+[32m+[m[32m      <!-- SÍMBOLO PULSANTE GAMESTORe -->[m
+       <div class="hidden md:flex items-center gap-3">[m
+         <div class="w-3 h-3 rounded-full bg-primary animate-pulse"></div>[m
+         <span class="font-extrabold tracking-wider text-sm uppercase text-primary">GameStore</span>[m
+[36m@@ -30,7 +30,7 @@[m
+ [m
+       <!-- NAVEGAÇÃO CLIENTE -->[m
+       <nav class="flex flex-col gap-1 mt-2">[m
+[31m-        <button [m
+[32m+[m[32m        <button[m
+           (click)="mudarAba('vitrine')"[m
+           [class.text-primary]="abaAtiva() === 'vitrine'"[m
+           [class.font-bold]="abaAtiva() === 'vitrine'"[m
+[36m@@ -39,7 +39,7 @@[m
+           Vitrine da Loja[m
+         </button>[m
+ [m
+[31m-        <button [m
+[32m+[m[32m        <button[m
+           (click)="mudarAba('biblioteca')"[m
+           [class.text-primary]="abaAtiva() === 'biblioteca'"[m
+           [class.font-bold]="abaAtiva() === 'biblioteca'"[m
+[36m@@ -51,7 +51,7 @@[m
+           }[m
+         </button>[m
+ [m
+[31m-        <button [m
+[32m+[m[32m        <button[m
+           (click)="mudarAba('meus-dados')"[m
+           [class.text-primary]="abaAtiva() === 'meus-dados'"[m
+           [class.font-bold]="abaAtiva() === 'meus-dados'"[m
+[36m@@ -96,9 +96,9 @@[m
+             </div>[m
+           </div>[m
+ [m
+[31m-          <input [m
+[31m-            type="text" [m
+[31m-            placeholder="Pesquisar jogo por nome..." [m
+[32m+[m[32m          <input[m
+[32m+[m[32m            type="text"[m
+[32m+[m[32m            placeholder="Pesquisar jogo por nome..."[m
+             [value]="termoBusca()"[m
+             (input)="termoBusca.set($any($event.target).value)"[m
+             class="bg-surface text-white placeholder-text-gray text-sm px-4 py-2.5 rounded-full w-full md:w-80 outline-none border border-transparent focus:border-primary"[m
+[36m@@ -183,9 +183,9 @@[m
+             </div>[m
+           </div>[m
+ [m
+[31m-          <input [m
+[31m-            type="text" [m
+[31m-            placeholder="Pesquisar em seus jogos..." [m
+[32m+[m[32m          <input[m
+[32m+[m[32m            type="text"[m
+[32m+[m[32m            placeholder="Pesquisar em seus jogos..."[m
+             [value]="termoBuscaBiblioteca()"[m
+             (input)="termoBuscaBiblioteca.set($any($event.target).value)"[m
+             class="bg-surface text-white placeholder-text-gray text-sm px-4 py-2.5 rounded-full w-full md:w-80 outline-none border border-transparent focus:border-primary"[m
+[36m@@ -250,8 +250,8 @@[m
+                 <h3 class="text-white font-bold text-base">Sua biblioteca está vazia</h3>[m
+                 <p class="text-text-gray text-xs">Você ainda não adquiriu nenhum jogo. Explore nossa vitrine e comece sua coleção agora mesmo!</p>[m
+               </div>[m
+[31m-              <button [m
+[31m-                (click)="mudarAba('vitrine')" [m
+[32m+[m[32m              <button[m
+[32m+[m[32m                (click)="mudarAba('vitrine')"[m
+                 class="bg-primary hover:bg-primary-hover text-white text-xs font-bold px-6 py-3 rounded-lg transition-colors cursor-pointer mt-2"[m
+               >[m
+                 Explorar a Vitrine[m
+[36m@@ -321,4 +321,4 @@[m
+       </div>[m
+     </div>[m
+   </div>[m
+[31m-}[m
+\ No newline at end of file[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/app/features/users/client/client.ts b/src/app/features/users/client/client.ts[m
+[1mindex e3fad29..9dad6c8 100644[m
+[1m--- a/src/app/features/users/client/client.ts[m
+[1m+++ b/src/app/features/users/client/client.ts[m
+[36m@@ -107,7 +107,7 @@[m [mexport class Client implements OnInit {[m
+   bibliotecaJogos = signal<JogoModel[]>([]);[m
+   /** Indica se a biblioteca de jogos está sendo carregada */[m
+   carregandoBiblioteca = signal(false);[m
+[31m-  /** Termo de busca para filtrar jogos na biblioteca */[m
+[32m+[m[32m  /** Termo de busca para filtrar jogos na bibliotecaa */[m
+   termoBuscaBiblioteca = signal<string>('');[m
+ [m
+   /**[m

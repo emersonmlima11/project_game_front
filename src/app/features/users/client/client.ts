@@ -107,7 +107,7 @@ export class Client implements OnInit {
   bibliotecaJogos = signal<JogoModel[]>([]);
   /** Indica se a biblioteca de jogos está sendo carregada */
   carregandoBiblioteca = signal(false);
-  /** Termo de busca para filtrar jogos na biblioteca */
+  /** Termo de busca para filtrar jogos na biblioteca*/
   termoBuscaBiblioteca = signal<string>('');
 
   /**
@@ -276,6 +276,49 @@ export class Client implements OnInit {
    */
   jogarJogo(jogo: JogoModel): void {
     this.mensagemFeedback.set(`Iniciando "${jogo.nome}"... Boa diversão! 🎮`);
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // ADICIONAR SALDO (MEUS DADOS)
+  // ─────────────────────────────────────────────────────────
+  valorAdicionarSaldo = signal<number>(50);
+  adicionandoSaldo = signal<boolean>(false);
+  mensagemSaldo = signal<string>('');
+  mensagemErroSaldo = signal<string>('');
+
+  /**
+   * Adiciona saldo à carteira do usuário logado.
+   * Rota protegida: PATCH /api/v1/usuarios/:id/saldo
+   * @param valorCustom Optional: valor a ser adicionado
+   */
+  adicionarSaldoCarteira(valorCustom?: number): void {
+    const currentUserId = this.userId();
+    if (!currentUserId) return;
+
+    const valor = valorCustom !== undefined ? Number(valorCustom) : Number(this.valorAdicionarSaldo());
+    if (isNaN(valor) || valor <= 0) {
+      this.mensagemErroSaldo.set('Informe um valor válido maior que zero.');
+      return;
+    }
+
+    this.mensagemErroSaldo.set('');
+    this.mensagemSaldo.set('');
+    this.adicionandoSaldo.set(true);
+
+    this.usuarioService.adicionarSaldo(currentUserId, valor).subscribe({
+      next: (usuarioAtualizado) => {
+        this.adicionandoSaldo.set(false);
+        this.authService.usuarioAtual.set(usuarioAtualizado);
+        localStorage.setItem('usuario_logado', JSON.stringify(usuarioAtualizado));
+        this.mensagemSaldo.set(`Saldo de R$ ${valor.toFixed(2)} adicionado com sucesso! 🎉`);
+        setTimeout(() => this.mensagemSaldo.set(''), 5000);
+      },
+      error: (err) => {
+        this.adicionandoSaldo.set(false);
+        const errMsg = err.error?.message || 'Erro ao adicionar saldo.';
+        this.mensagemErroSaldo.set(errMsg);
+      }
+    });
   }
 
   // ─────────────────────────────────────────────────────────

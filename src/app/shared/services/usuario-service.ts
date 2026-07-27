@@ -91,4 +91,16 @@ export class UsuarioService {
   listarJogosDoUsuario(id: number): Observable<JogoModel[]> {
     return this.http.get<JogoModel[]>(`${this.apiUrl}/${id}/jogos`);
   }
+
+  /**
+   * Adiciona saldo à carteira de um usuário via API.
+   * Rota protegida: POST /api/v1/usuarios/:id/saldo (e PATCH)
+   *
+   * @param id - Identificador do usuário.
+   * @param valor - Quantia em R$ a ser adicionada.
+   * @returns Observable com o {@link UserModel} contendo o novo saldo.
+   */
+  adicionarSaldo(id: number, valor: number): Observable<UserModel> {
+    return this.http.post<UserModel>(`${this.apiUrl}/${id}/saldo`, { valor });
+  }
 }
