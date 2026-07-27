@@ -40,6 +40,18 @@
         </button>
 
         <button 
+          (click)="mudarAba('biblioteca')"
+          [class.text-primary]="abaAtiva() === 'biblioteca'"
+          [class.font-bold]="abaAtiva() === 'biblioteca'"
+          class="text-left py-2.5 px-3 rounded-lg text-sm text-text-gray hover:text-white hover:bg-surface/50 transition-all cursor-pointer flex items-center justify-between"
+        >
+          <span>Minha Biblioteca</span>
+          @if (bibliotecaJogos().length > 0) {
+            <span class="bg-primary/20 text-primary text-xs px-2 py-0.5 rounded-full font-bold">{{ bibliotecaJogos().length }}</span>
+          }
+        </button>
+
+        <button 
           (click)="mudarAba('meus-dados')"
           [class.text-primary]="abaAtiva() === 'meus-dados'"
           [class.font-bold]="abaAtiva() === 'meus-dados'"
@@ -113,6 +125,11 @@
                   } @else {
                     <div class="w-full h-full flex items-center justify-center text-text-gray text-xs">Sem imagem</div>
                   }
+                  @if (jaPossuiJogo(jogo.id)) {
+                    <div class="absolute top-3 right-3 bg-emerald-500/90 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full shadow">
+                      Na Biblioteca
+                    </div>
+                  }
                 </div>
 
                 <div class="p-4 flex flex-col gap-3 flex-1 justify-between">
@@ -125,9 +142,15 @@
                     <button (click)="abrirDetalhes(jogo)" class="bg-zinc-700 hover:bg-zinc-600 text-white text-xs font-semibold py-2 rounded transition-colors cursor-pointer">
                       Detalhes
                     </button>
-                    <button (click)="comprarJogo(jogo)" [disabled]="comprando()" class="bg-primary hover:bg-primary-hover text-white text-xs font-bold py-2 rounded transition-colors cursor-pointer disabled:opacity-50">
-                      Comprar
-                    </button>
+                    @if (jaPossuiJogo(jogo.id)) {
+                      <button (click)="mudarAba('biblioteca')" class="bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/30 text-xs font-bold py-2 rounded transition-colors cursor-pointer">
+                        Adquirido
+                      </button>
+                    } @else {
+                      <button (click)="comprarJogo(jogo)" [disabled]="comprando()" class="bg-primary hover:bg-primary-hover text-white text-xs font-bold py-2 rounded transition-colors cursor-pointer disabled:opacity-50">
+                        Comprar
+                      </button>
+                    }
                   </div>
                 </div>
               </div>
@@ -140,6 +163,99 @@
               Nenhum jogo encontrado para <strong class="text-white">"{{ termoBusca() }}"</strong>.
             } @else {
               Nenhum jogo disponível na vitrine no momento.
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ABA: MINHA BIBLIOTECA -->
+    @if (abaAtiva() === 'biblioteca') {
+      <div class="flex flex-col gap-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 class="text-xs font-bold tracking-widest text-text-gray uppercase">MINHA BIBLIOTECA</h1>
+            <div class="text-white font-bold text-xl mt-1 flex items-center gap-2">
+              Seus Jogos Adquiridos
+              <span class="bg-primary/20 text-primary text-sm px-2.5 py-0.5 rounded-full font-extrabold">
+                {{ bibliotecaJogos().length }}
+              </span>
+            </div>
+          </div>
+
+          <input 
+            type="text" 
+            placeholder="Pesquisar em seus jogos..." 
+            [value]="termoBuscaBiblioteca()"
+            (input)="termoBuscaBiblioteca.set($any($event.target).value)"
+            class="bg-surface text-white placeholder-text-gray text-sm px-4 py-2.5 rounded-full w-full md:w-80 outline-none border border-transparent focus:border-primary"
+          />
+        </div>
+
+        @if (carregandoBiblioteca()) {
+          <div class="w-full min-h-[200px] flex items-center justify-center">
+            <div class="flex items-center gap-2 text-text-gray text-sm">
+              <svg class="animate-spin h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              Carregando sua biblioteca...
+            </div>
+          </div>
+        } @else if (bibliotecaFiltrada().length > 0) {
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            @for (jogo of bibliotecaFiltrada(); track jogo.id) {
+              <div class="bg-surface/50 border border-surface hover:border-primary/50 rounded-xl overflow-hidden transition-all duration-300 flex flex-col group">
+                <div class="h-48 w-full overflow-hidden bg-background relative">
+                  @if (jogo.urlImagem) {
+                    <img [src]="jogo.urlImagem" [alt]="jogo.nome" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  } @else {
+                    <div class="w-full h-full flex items-center justify-center text-text-gray text-xs">Sem imagem</div>
+                  }
+                  <div class="absolute top-3 right-3 bg-emerald-500/90 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full shadow">
+                    Adquirido
+                  </div>
+                </div>
+
+                <div class="p-4 flex flex-col gap-3 flex-1 justify-between">
+                  <div>
+                    <span class="text-xs font-semibold text-primary uppercase tracking-wider">{{ jogo.tipo }}</span>
+                    <h3 class="font-bold text-white text-base leading-tight mt-0.5">{{ jogo.nome }}</h3>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-2 mt-2">
+                    <button (click)="abrirDetalhes(jogo)" class="bg-zinc-700 hover:bg-zinc-600 text-white text-xs font-semibold py-2 rounded transition-colors cursor-pointer">
+                      Detalhes
+                    </button>
+                    <button (click)="jogarJogo(jogo)" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 rounded transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/20">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5">
+                        <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" />
+                      </svg>
+                      Jogar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="w-full bg-surface/30 border border-surface/50 rounded-xl p-12 text-center flex flex-col items-center gap-4">
+            <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl">
+              🎮
+            </div>
+            @if (termoBuscaBiblioteca()) {
+              <p class="text-text-gray text-sm">Nenhum jogo encontrado na sua biblioteca para <strong class="text-white">"{{ termoBuscaBiblioteca() }}"</strong>.</p>
+            } @else {
+              <div class="flex flex-col items-center gap-2 max-w-sm">
+                <h3 class="text-white font-bold text-base">Sua biblioteca está vazia</h3>
+                <p class="text-text-gray text-xs">Você ainda não adquiriu nenhum jogo. Explore nossa vitrine e comece sua coleção agora mesmo!</p>
+              </div>
+              <button 
+                (click)="mudarAba('vitrine')" 
+                class="bg-primary hover:bg-primary-hover text-white text-xs font-bold px-6 py-3 rounded-lg transition-colors cursor-pointer mt-2"
+              >
+                Explorar a Vitrine
+              </button>
             }
           </div>
         }
@@ -189,13 +305,19 @@
       </div>
       <div class="flex justify-end gap-3 pt-2 border-t border-surface">
         <button (click)="fecharModal()" class="bg-zinc-700 hover:bg-zinc-600 text-white text-xs font-semibold px-4 py-2.5 rounded-lg cursor-pointer">Cancelar</button>
-        <button (click)="comprarJogo(jogo)" [disabled]="comprando()" class="bg-primary hover:bg-primary-hover text-white text-xs font-bold px-6 py-2.5 rounded-lg cursor-pointer disabled:opacity-50">
-          @if (comprando()) {
-            Processando...
-          } @else {
-            Confirmar Compra
-          }
-        </button>
+        @if (jaPossuiJogo(jogo.id)) {
+          <button (click)="mudarAba('biblioteca'); fecharModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-6 py-2.5 rounded-lg cursor-pointer">
+            Ver na Biblioteca
+          </button>
+        } @else {
+          <button (click)="comprarJogo(jogo)" [disabled]="comprando()" class="bg-primary hover:bg-primary-hover text-white text-xs font-bold px-6 py-2.5 rounded-lg cursor-pointer disabled:opacity-50">
+            @if (comprando()) {
+              Processando...
+            } @else {
+              Confirmar Compra
+            }
+          </button>
+        }
       </div>
     </div>
   </div>
